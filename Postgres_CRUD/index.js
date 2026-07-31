@@ -55,6 +55,7 @@ app.get('/products', async(req, res)=>{
     res.send(result.rows)
 })
 
+
 app.delete('/users/:id', async(req, res)=>{
     const {id} = req.params
     const result = await pool.query(`
