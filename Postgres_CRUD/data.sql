@@ -318,3 +318,68 @@ from users
 left join orders
 on users.id = orders.user_id
 group by users.name;
+
+
+-- Only users who have placed more than one order.
+-- Expected output:
+-- Name	Total Orders
+-- Ashu	 2
+
+select users.name, count(orders.id) as total_orders
+from users
+left join orders
+on users.id = orders.user_id
+group by users.name
+having count(orders.id) > 1;
+
+
+
+CREATE TABLE products (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    price INT
+);
+
+
+INSERT INTO products (id, name, price)
+VALUES
+(101, 'Mouse', 500),
+(102, 'Keyboard', 1200),
+(103, 'Laptop', 60000),
+(104, 'Monitor', 15000),
+(105, 'laptop stand', 1000),
+(106, 'Monitor stand', 1500),
+(107, 'Usb Dongle', 15000);
+
+ALTER TABLE orders
+ADD COLUMN product_id INT;
+
+UPDATE orders SET product_id = 101 WHERE id = 1;
+UPDATE orders SET product_id = 102 WHERE id = 2;
+UPDATE orders SET product_id = 103 WHERE id = 3;
+UPDATE orders SET product_id = 104 WHERE id = 4;
+UPDATE orders SET product_id = 105 WHERE id = 5;
+UPDATE orders SET product_id = 106 WHERE id = 6;
+UPDATE orders SET product_id = 107 WHERE id = 7;
+
+alter table orders
+drop column amount;
+
+
+
+-- Your challenge
+
+-- Write one query that returns:
+
+-- User	Product	Price
+-- Ashu	Mouse	500
+-- Ashu	Keyboard	1200
+-- Rahul	Laptop	60000
+-- Neha	Monitor	15000
+
+select users.name, products.name, products.price
+from users
+inner join orders
+on users.id = orders.user_id
+left join products
+on products.id = orders.product_id;
