@@ -185,6 +185,10 @@ group by city
 having count(*)>1; -- why not (where)? because where works on rows not groups. Having works on groups
 
 
+select city, avg(age) as average_age
+from users
+group by city;
+
 -- GROUP BY
 -- Count users in each city.
 select city, count(*) as people_living
@@ -262,6 +266,7 @@ values
 (7, 'pen');
 
 
+
 -- INNER JOIN - only returns matching rows from both the table
 select users.name, orders.product -- columns to show in result
 from users -- left table
@@ -301,6 +306,14 @@ select users.name, count(orders.id) as total_orders
 from users
 left join orders
 on users.id = orders.user_id
+group by users.name;
+
+select users.name, COALESCE(sum(products.price)) as total_price
+from users
+inner join orders
+on users.id = orders.user_id
+left join products
+on orders.product_id = products.id
 group by users.name;
 
 
@@ -383,3 +396,108 @@ inner join orders
 on users.id = orders.user_id
 left join products
 on products.id = orders.product_id;
+
+
+
+-- Return this report:
+
+-- User	Total Orders	Total Amount
+-- Ashu	    2	        1700
+-- Rahul	1	        60000
+-- Aman	    0	        0
+-- Neha	    1	        15000
+-- Priya	0	        0
+
+select users.name, COALESCE(count(orders.id), 0) as total_orders, COALESCE(sum(products.price), 0) as Amount
+from users
+left join orders
+on users.id = orders.user_id
+left join products
+on products.id = orders.product_id
+group by users.name;
+
+
+
+
+select name, price, case 
+when price >= 12999 then 'Expensive'
+else 'Cheap'
+end as type
+from products;
+
+-- total number of premium products (more than 999)
+select count(
+    case 
+    when price >= 19999 then 1
+    end
+) as premium_products
+from products;
+
+
+create table salary(
+    id serial primary key,
+    amount int,
+    user_id int,
+
+    constraint fk_user
+    foreign key(user_id)
+    references users(id)
+);
+
+insert into salary (amount, user_id)
+values
+(20000, 2),
+(30000, 4),
+(24000, 5),
+(27000, 6),
+(14000, 7),
+(60000, 8),
+(45000, 9);
+
+select users.name, salary.amount, case 
+when salary.amount <= 30000 then 'low'
+when salary.amount <= 60000 then 'medium'
+else 'high'
+end as level
+from users
+left join salary
+on users.id = salary.user_id;
+
+
+-- stirng functions
+
+select name, upper(name) from users;
+select name, lower(name) from users;
+select name, trim(name) from users;
+select name, length(name) from users;
+
+select concat(name, ' ', age) from users; -- joins multiple strings
+
+select substring(name from 1 for 3) from users; -- extracts part of string (Ashu) --> Ash
+
+
+select left(name, 2) from users; -- returns characters from the left.
+select right(name, 2) from users;
+
+select email, position('@' in email) from users; -- Finds where a substring appears.
+
+select replace(email, '@gmail.com', '@yahoo.com') from users;
+
+
+-- Suppose you want a report.
+
+-- Instead of
+-- Name	Email
+-- Ashu	ashu@gmail.com
+
+-- You want
+-- NAME	Username
+-- ASHU	ashu
+
+select upper(name), substring(email from 1 for position('@' in email)-1) as Username
+from users;
+
+-- date
+select current_date;
+
+select current_timestamp;
