@@ -289,7 +289,8 @@ on users.id = orders.user_id;
 select users.name, orders.product
 from users
 full outer join orders
-on users.id = orders.user_id;
+on users.id = orders.user_id
+group by users.name;
 
 
 
@@ -426,6 +427,8 @@ end as type
 from products;
 
 -- total number of premium products (more than 999)
+select count(*) from products
+where price >= 19999;
 select count(
     case 
     when price >= 19999 then 1
@@ -501,3 +504,19 @@ from users;
 select current_date;
 
 select current_timestamp;
+
+
+-- subqueries - A query written inside another query. first find this, then use that result in the main query
+
+select name, age 
+from users
+where age >= (
+    select avg(age) from users
+);
+
+
+select name
+from users
+where id in (
+    select user_id from orders
+);
